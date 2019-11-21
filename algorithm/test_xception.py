@@ -13,7 +13,6 @@ import torch
 from torchvision import transforms
 from PIL import Image
 import math
-import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.utils.model_zoo as model_zoo
@@ -225,7 +224,9 @@ def xception(num_classes=1000, pretrained='imagenet'):
     return model
 
 
-model_path = 'trained_model/model_best_xception.pth.tar'
+# model_path = 'algorithm/trained_model/model_best_xception.pth.tar'
+model_path = './trained_model/model_best_xception.pth.tar'
+
 
 print("=> creating model '{}'".format('resnet50'))
 model = xception(num_classes=1000,pretrained=None)
@@ -248,13 +249,15 @@ def predict(input_img_path,):
                 共 'cardboard','glass','metal','paper','plastic','trash' 6 个类别
         """
     # ----------------- 实现模型预测部分的代码 ----------------------
+
+    input_img_path=Image.open(input_img_path)
     dict_key={0: 'cardboard', 1: 'glass', 2: 'metal', 3: 'paper', 4: 'plastic', 5: 'trash'}
     normalize = transforms.Normalize(mean=[0.5, 0.5, 0.5],
                                      std=[0.5, 0.5, 0.5])
     transform = transforms.Compose([transforms.Resize(333),
         transforms.CenterCrop(299),
         transforms.ToTensor(),normalize])
-    image=transform(img)
+    image=transform(input_img_path)
     image=torch.unsqueeze(image,0)
 
     model.eval()
@@ -273,8 +276,10 @@ def predict(input_img_path,):
 
 # def run(input_img_path,)
 
+
 if __name__ == '__main__':
-    img1=Image.open('data/val/glass/glass403.jpg')
+    img1=Image.open('../images/grass.jpg')
+    # print(img1)
     # img2=Image.open('data/val/paper/paper500.jpg')
     # img3=Image.open('data/val/cardboard/cardboard350.jpg')
     # img4=Image.open('data/val/plastic/plastic385.jpg')

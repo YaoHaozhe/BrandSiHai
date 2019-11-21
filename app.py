@@ -2,7 +2,6 @@
 from flask import Flask, jsonify  ,request , render_template
 from werkzeug import secure_filename
 
-from PIL import Image
 from algorithm import  test_xception as prediction
 
 app = Flask(__name__)
@@ -23,8 +22,7 @@ def upload_file():
         f_name = secure_filename(f.filename)
         f_dir  = 'images/' + f_name
         f.save(f_dir)
-        img = Image.open(f_dir)
-        res = prediction.predict(img)
+        res = prediction.predict(f_dir)
         return jsonify({'item' : res}) , 201
     return jsonify({'info': 'not a post request'}), 201
 

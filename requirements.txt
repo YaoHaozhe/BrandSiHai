@@ -1,0 +1,8 @@
+gunicorn
+gevent
+flask
+virtualenv
+torch
+torchvision
+pillow
+numpy
