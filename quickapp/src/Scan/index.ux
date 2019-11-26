@@ -1,0 +1,244 @@
+<template>
+  <div class="demo-page">    
+
+    <block>
+      <camera id="camera" class="camera" 
+        deviceposition="{{deviceposition}}" 
+        flash="{{flash}}"  onerror="handlerError"
+        style="visibility:{{ resultFlag ? 'hidden':'visible' }}"
+        >
+      </camera>
+
+      <div class="mask-top shade"  
+        style="visibility:{{ resultFlag ? 'hidden':'visible' }}"
+      ></div>
+      <div class="mask-left shade"
+        style="visibility:{{ resultFlag ? 'hidden':'visible' }}"
+      ></div>
+      <div class="scan-frame"
+        style="visibility:{{ resultFlag ? 'hidden':'visible' }}"
+      ></div>
+      <div class="mask-right shade"
+        style="visibility:{{ resultFlag ? 'hidden':'visible' }}"
+      ></div>
+      <div class="mask-bottom shade"
+        style="visibility:{{ resultFlag ? 'hidden':'visible' }}"
+      ></div>
+    </block>
+
+    <img 
+      style="visibility:{{ !resultFlag ? 'hidden':'visible' }}"
+      class="result-image" src={{pictureUrl}}>
+
+    <div class="bottom-contain {{pop}}" onswipe="gestureFn">
+    
+        <block if="{{ !resultFlag }}" >
+          <input class="btn" type="button" onclick="takePhoto" value="拍照" />
+        </block>
+        
+        <block if="{{ resultFlag }}" >
+          <text class="result-text" >
+              {{pictureUrl}}
+          </text>
+        </block>
+
+    </div>
+
+  </div>
+</template>
+
+<script>
+/**
+ * 默认的菜单页(可自定义)
+ * name默认为manifest文件中的name字段
+ * icon默认为manifest文件中的icon字段
+ * 若需修改页面中文本，请修改ViewModel private中对应变量
+ * 注意：使用加载器测试`创建桌面快捷方式`功能时，需要进入系统设置->权限管理->开启应用加载器的`桌面快捷方式`权限，才能保存到桌面。应用上线后可自动获取`桌面快捷方式`权限
+ */
+export default {
+  protected: {
+    name: null,
+    icon: null
+  },
+  private: {
+    pop: '',
+    deviceposition: "back",
+    flash: "auto",
+    photoQuality: 'normal',
+    pictureUrl:'',
+    resultFlag:false
+  },
+  onInit () {
+    // 设置标题栏
+    // this.$page.setTitleBar({ text: this.name })
+
+  },
+  createShortcut () {
+    // 创建快捷方式
+    this.$app.$def.createShortcut()
+  },
+  gestureFn( e ){
+     const di = e.direction
+     if(di == 'up'){
+        this.pop = 'popUp'
+        // if(!this.resultFlag)
+          // this.showResult()
+     }else if(di == 'down'){
+        this.pop = 'popDown'
+        if(this.resultFlag)
+          this.hideResult()
+     }
+  },
+  handlerError () {
+      console.log('用户不允许使用摄像头')
+  },
+  takePhoto () {
+    let _this = this
+
+    // 调用相机组件的照相功能
+    this.$element('camera').takePhoto({
+      // 通过quality参数设置照片质量 默认为normal
+      quality: _this.photoQuality,
+      success(data){
+        // 获取回调中的照片地址
+        _this.pictureUrl = data.uri
+        console.log(data)
+        // 上传
+        _this.pop = 'popUp'
+        _this.showResult()
+      },
+      fail(data, code) {
+        console.log('take photos failed：code' + code.code)
+      },
+      complete() {
+        console.log('complete')
+      }
+    })
+  },
+  showResult(){
+      this.resultFlag = true
+  },
+  hideResult(){
+      this.resultFlag = false
+  }
+}
+</script>
+
+<style>
+
+  .demo-page {
+    width: 100%;
+  }
+
+  .bottom-contain{
+    position:fixed;
+    bottom: 0px;
+    height: 200px;
+    width: 100%;
+    background-color: #ffffff;
+    border-top-left-radius: 65px;
+    border-top-right-radius: 65px;
+
+    flex-direction: column;
+    justify-content:center;
+    align-items: center;
+  }
+  .popUp{
+    animation-name: PopUp;
+    animation-duration: 300ms;
+    height: 500px;
+  }
+  .popDown{
+    animation-name: PopDown;
+    animation-duration: 300ms;
+    height: 200px;
+  }
+  @keyframes PopUp {
+    from {
+      height: 200px;
+    }
+    to {
+      height: 500px;
+    }
+  }
+  @keyframes PopDown {
+    to {
+      height: 200px;
+    }
+    from {
+      height: 500px;
+    }
+  }
+
+  /* 按钮 */
+  .btn {
+    width: 250px;
+    height: 86px;
+    /*margin-top: 57px;*/
+    border-radius: 43px;
+    background-color: #13c2c2;
+    font-size: 30px;
+    color: #ffffff;
+  }
+
+  .camera {
+    width: 750px;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+  }
+  
+  /*中间取景框*/
+  .scan-frame{ 
+     position: fixed;
+     top: 200px;
+     left: 125px;
+     height: 500px;
+     width: 500px;
+     background-color: #fff;
+     opacity: 0.1;
+  }
+
+  /*四周遮罩*/
+  .shade{
+    background-color: #f0f5ff;
+    opacity: 0.6;
+  }
+  .mask-top{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 750px;
+    height: 200px;
+  }
+  .mask-left{
+    position: fixed;
+    top: 200px;
+    width: 125px;
+    height: 500px;
+  }
+  .mask-right{
+    position: fixed;
+    left: 625px;
+    top: 200px;
+    width: 125px;
+    height: 500px;
+  }
+  .mask-bottom{
+    position: fixed;
+    top: 700px;
+    width: 750px;
+    height: 800px;
+  }
+
+  /*拍摄图像*/
+  .result-image{
+    width: 750px;
+    height: 90%;
+  }
+  .result-text{
+    font-size:20px;
+    font-weight:bold;
+  }
+</style>
