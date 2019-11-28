@@ -13,4 +13,4 @@ This is a quickAPP centered on Brand.
 - Github 项目 **/quickapp/dist**  下载导出的 **.rpk** 包，使用 **快应用调试器** 安装
 - 运行并测试
 
-![运行示例](./snapshot⁩/howtouse.gif)
+![运行示例](snapshot⁩/howtouse.gif)
