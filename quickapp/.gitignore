@@ -1,4 +1,9 @@
 node_modules
 build
-dist
-.ide
+.DS_Store
+Thumbs.db
+*.log
+*.iml
+.ide/
+.idea/
+.vscode/

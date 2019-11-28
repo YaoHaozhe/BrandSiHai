@@ -1,28 +1,23 @@
 {
-  "package": "com.example.demo",
-  "name": "demo",
+  "package": "com.application.demo",
+  "name": "quickapp",
   "versionName": "1.0.0",
   "versionCode": "1",
   "minPlatformVersion": "1020",
   "icon": "/Common/logo.png",
   "features": [
-    {
-      "name": "system.prompt"
-    },
-    {
-      "name": "system.router"
-    },
-    {
-      "name": "system.shortcut"
-    }
+    { "name": "system.prompt" },
+    { "name": "system.router" },
+    { "name": "system.shortcut" },
+    { "name": "system.fetch"},
+    { "name": "system.request"},
+    { "name": "system.media'"}
   ],
   "permissions": [
-    {
-      "origin": "*"
-    }
+    { "origin": "*" }
   ],
   "config": {
-    "logLevel": "off"
+    "logLevel": "debug"
   },
   "router": {
     "entry": "Scan",
@@ -30,6 +25,15 @@
       "Scan": {
         "component": "index"
       },
+      "Demo": {
+        "component": "index"
+      },
+      "DemoDetail": {
+        "component": "index"
+      },
+      "About": {
+        "component": "index"
+      }
     },
     "widgets": {
       "CardDemo": {
@@ -37,10 +41,6 @@
         "description": "快应用卡片展示",
         "component": "index",
         "path": "/CardDemo",
-        "minPlatformVersion": 1032,
-        "targetManufactorys": [
-          "vivo"
-        ],
         "features": []
       }
     }
@@ -48,11 +48,23 @@
   "display": {
     "titleBarBackgroundColor": "#f2f2f2",
     "titleBarTextColor": "#414141",
-    "menu": true,
     "pages": {
+      "Demo": {
+        "titleBarText": "示例页",
+        "menu": false
+      },
+      "DemoDetail": {
+        "titleBarText": "详情页"
+      },
+      "About": {
+        "menu": false
+      },
       "Scan": {
         "menu": false,
-        "titleBar": false
+        "titleBar": false,
+        "statusBarImmersive": true,
+        "statusBarTextStyle": "auto",
+        "statusBarBackgroundColor": "#f2f2f2"
       }
     }
   }
