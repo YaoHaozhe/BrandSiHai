@@ -3,22 +3,14 @@ This is a quickAPP centered on Brand.
 
 
 ## Server
+- `docker build -t 'brandsihai' . `  build docker image
+- `docker run -it --rm -p 7001:7001  -v /home/ftp/BrandSiHai:/Project/demo brandsihai`  run image on port 7001 ,and mount your directory to docker file system (so that model.tar can be access)
+- `localhost:7001/test`  access address on browser
+- `http://139.9.124.104:7001/test`  remote backend api 
 
-### Test Algorithm
-- Set the python envs
-- Place the trained model to ```trained_model```
-- Run ```python test_xception.py``` 
+## Quick App
+- 安卓客户端 。 快应用资源下载页面 ，下载 [快应用调试器](https://www.quickapp.cn/docCenter/post/69) ，安装
+- Github 项目 **/quickapp/dist**  下载导出的 **.rpk** 包，使用 **快应用调试器** 安装
+- 运行并测试
 
-###  How to Begin
-#### 1. Installations
-- `flask、virtualenv、gunicorn` 
-- `algogrithm/requirements.txt` 
-
-#### 2. Start
-1. `virtualenv flask`   
-2. `flask/bin/pip install flask` 
-3. `chmod a+x app.py`     
-4. `./app.py` 
-
-#### 3. Test Run
-Browser : `localhost:7001`
+![运行示例](./snapshot⁩/howtouse.gif)
