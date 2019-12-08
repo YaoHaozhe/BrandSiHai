@@ -6,3 +6,7 @@ torch
 torchvision
 pillow
 numpy
+
+# yolo3 model requirements
+keras
+tensorflow=1.14
