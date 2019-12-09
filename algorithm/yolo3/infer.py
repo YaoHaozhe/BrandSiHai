@@ -216,22 +216,22 @@ parser = argparse.ArgumentParser(argument_default=argparse.SUPPRESS)
 Command line options
 '''
 parser.add_argument(
-    '--model', type=str,
+    '--model', type=str,required=False,
     help='path to model weight file, default ' + YOLO.get_defaults("model_path")
 )
 
 parser.add_argument(
-    '--anchors', type=str,
+    '--anchors', type=str,required=False,
     help='path to anchor definitions, default ' + YOLO.get_defaults("anchors_path")
 )
 
 parser.add_argument(
-    '--classes', type=str,
+    '--classes', type=str,required=False,
     help='path to class definitions, default ' + YOLO.get_defaults("classes_path")
 )
 
 parser.add_argument(
-    '--gpu_num', type=int,
+    '--gpu_num', type=int,required=False,
     help='Number of GPU to use, default ' + str(YOLO.get_defaults("gpu_num"))
 )
 
@@ -248,7 +248,7 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    "--output", nargs='?', type=str, default="",
+    "--output", nargs='?', type=str, required=False,default="",
     help = "[Optional] Video output path"
 )
 
