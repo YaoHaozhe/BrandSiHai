@@ -1,8 +1,9 @@
 #!flask/bin/python
 from flask import Flask, jsonify  ,request , render_template
 from werkzeug import secure_filename
-
-from algorithm import  test_xception as prediction
+import sys
+sys.path.append('algorithm/yolo3/')
+import infer as prediction
 
 app = Flask(__name__)
 
@@ -21,8 +22,10 @@ def upload_file():
         f = request.files['upload']
         f_name = secure_filename(f.filename)
         f_dir  = 'images/' + f_name
+        f_dir_out = 'images/' + 'output.jpg'
         f.save(f_dir)
-        res = prediction.predict(f_dir)
+        res = prediction.main(f_dir,f_dir_out )
+        print(res)
         return jsonify({'item' : res}) , 201
     return jsonify({'info': 'not a post request'}), 201
 
