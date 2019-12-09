@@ -236,7 +236,7 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    '--image', default=False, action="store_true",
+    '--image', default=False, required=False,action="store_true",
     help='Image detection mode, will ignore all positional arguments'
 )
 '''
