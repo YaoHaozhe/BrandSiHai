@@ -27,10 +27,14 @@ def upload_file():
         res = []
         names,scores,positions = prediction.main(f_dir,f_dir_out )
         for i in range(0, len(names)):
+            top, left, bottom, right = positions[i]
             res.append({
                 'name': names[i],
                 'score': str(scores[i]),
-                'position': str(positions[i])
+                'position': {
+                    'top' : str(top),
+                    'left': str(left)
+                }
             })
         print(res)
         return jsonify({'item' : res}) , 201
