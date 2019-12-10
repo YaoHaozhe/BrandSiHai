@@ -24,7 +24,13 @@ def upload_file():
         f_dir  = 'images/' + f_name
         f_dir_out = 'images/' + 'output.jpg'
         f.save(f_dir)
-        res = prediction.main(f_dir,f_dir_out )
+        res = []
+        names,scores = prediction.main(f_dir,f_dir_out )
+        for i in range(0, len(names)):
+            res.append({
+                'name': names[i],
+                'score': str(scores[i])
+            })
         print(res)
         return jsonify({'item' : res}) , 201
     return jsonify({'info': 'not a post request'}), 201
