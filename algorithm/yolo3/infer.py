@@ -163,7 +163,8 @@ class YOLO(object):
         #     del draw
         end = timer()
         print(end - start)
-        return image,out_scores, out_classes
+        print(out_boxes)
+        return image,out_scores, out_classes,out_boxes
 
     def close_session(self):
         self.sess.close()
@@ -263,14 +264,14 @@ def main(input_img_path,output_img_path):
     except:
         print('Open input image Error! Try again!')
     else:
-        r_image,out_scores, out_classes = yolo.detect_image(image)
+        r_image,out_scores, out_classes,out_boxes = yolo.detect_image(image)
         # r_image.save(output_img_path)
 
     class_names=yolo._get_class()
     predict_names=[]
     for i in range(len(out_classes)):
         predict_names.append(class_names[out_classes[i]])
-    return predict_names,out_scores
+    return predict_names,out_scores,out_boxes
 
 
 if __name__=="__main__":
