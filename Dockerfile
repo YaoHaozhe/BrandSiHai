@@ -8,4 +8,5 @@ RUN flask/bin/pip install flask
 
 COPY . .
 
-CMD ["gunicorn", "app:app", "-c", "./gunicorn.conf.py"]
+# CMD ["gunicorn", "app:app", "-c", "./gunicorn.conf.py"]
+CMD ["python" , "app.py" , "--nothreading"]
