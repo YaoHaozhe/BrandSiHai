@@ -11,7 +11,8 @@
     { "name": "system.shortcut" },
     { "name": "system.fetch"},
     { "name": "system.request"},
-    { "name": "system.media'"}
+    { "name": "system.media'"},
+    { "name": "system.image" }
   ],
   "permissions": [
     { "origin": "*" }
@@ -46,8 +47,6 @@
     }
   },
   "display": {
-    "titleBarBackgroundColor": "#f2f2f2",
-    "titleBarTextColor": "#414141",
     "pages": {
       "Demo": {
         "titleBarText": "示例页",
@@ -61,11 +60,9 @@
       },
       "Scan": {
         "menu": false,
-        "titleBar": false,
-        "statusBarImmersive": true,
-        "statusBarTextStyle": "auto",
-        "statusBarBackgroundColor": "#f2f2f2"
+        "titleBar": false
       }
-    }
+    },
+    "windowSoftInputMode": "adjustResize"
   }
 }

@@ -1,8 +1,9 @@
 <!-- <import name='titleBar' src='../Common/circle'></import> -->
 
 <template>
-  <div class="demo-page">    
-
+  <div class="scan-page">    
+  
+    <!-- 拍照部分 -->
     <block>
       <camera id="camera" class="camera" 
         deviceposition="{{deviceposition}}" 
@@ -25,20 +26,31 @@
       <div class="mask-bottom shade"
         style="visibility:{{ resultFlag ? 'hidden':'visible' }}"
       ></div>
-  </block>
+    </block>
 
-  <img 
-    style="visibility:{{ !resultFlag ? 'hidden':'visible' }}"
-    class="result-image" src={{pictureUrl}}></img>
+    <!-- 返回图片展示 -->
+    <div style="visibility:{{ !resultFlag ? 'hidden':'visible' }}"
+        class="result-image-contain">
+      <img src={{pictureUrl}}></img>
+        
+        <block  for="item in resItemsList">
+            <text class='result-text-upon-image'
+                style="top:{{ item.top }}px ; left:{{ item.left }}px";
+            >
+              {{item.name}}
+            </text>
+        </block>
+    </div>
 
-  <div class="bottom-contain {{pop}}" onswipe="gestureFn">
-  
+    <!-- 底部框 -->
+    <div class="bottom-contain {{pop}}" onswipe="gestureFn">
+    
       <block if="{{ !resultFlag }}" >
           <div class="btn-contain">
             <div class="album-contain" onclick="chooseAlbum">
               <img  src='../Common/相册.png' class="album-img"></img>
             </div>
-            <input class="btn" type="button" onclick="takePhoto" value="拍照" />
+            <input class="btn-camera" type="button" onclick="takePhoto" value="拍照" />
             <div class="album-contain"  style="background-color: #fff"></div>
           </div>
 
@@ -50,9 +62,10 @@
           </div>
 
           <div class="warp-line"></div>
-          <text class='object-name'>
+<!--           <text class='object-name'>
             识别物体 : {{objectName}}
-          </text>
+          </text> -->
+
           <div class="percent-contain">
             <canvas id="canvas"></canvas>
             <text class='percent-num'> {{ (percent*100).toFixed(0) }}% </text>
@@ -63,9 +76,8 @@
           <div if="{{ percent < TH }}" class="report-contain" onclick="reportBack" >
               <text> 结果不正确？点击反馈 </text>
           </div>
-
-      </block>
-  </div>
+        </block>
+    </div>
 
   </div>
 </template>
@@ -75,6 +87,7 @@
   import prompt from '@system.prompt'
   import request from '@system.request'
   import media from '@system.media'
+  import image from '@system.image'
 
 export default {
   protected: {
@@ -91,16 +104,15 @@ export default {
     fetchedData:'',
     objectName:'',
     percent:0,
-    TH: 0.6  //可信度门槛
+    TH: 0.6,  //可信度门槛
+    resItemsList:[],
+    rate:1,
+    scanFrameMarginLeftRight:80,
+    scanFrameMarginTop:400,
+    scanFrameWidth:590,
+    scanFrameHeight:590
   },
   onInit () {
-    // 设置标题栏
-    // this.$page.setTitleBar({ text: this.name })
-    // this.fetchDataNormal()
-    // this.$page.setStatusBar({ 
-    //   immersive: true,
-    //   backgroundOpacity:0
-    // })
   },
   onShow(){
   },
@@ -129,7 +141,39 @@ export default {
         success: function(data) {
           // console.log(`handling success: ${data.uri}`)
           self.pictureUrl = data.uri
-          self.uploadFile()
+          // self.uploadFile()
+
+          image.editImage({
+            uri: self.pictureUrl ,
+            aspectRatioX:1,
+            aspectRatioY:1,
+            success: async function(data) {
+              self.pictureUrl = data.uri
+              await new Promise((resolve,reject)=>{
+                image.getImageInfo({
+                    uri: self.pictureUrl,
+                    success: function(data) {
+                      self.rate =   416 / data.width
+                      console.log(self.rate)
+                      resolve()
+                    },
+                    fail: function(data, code) {
+                        console.log(`handling fail, code = ${code}`)
+                    }
+                  })
+              })
+              console.log('update')
+              self.uploadFile()
+              console.log(`handling success: ${data.uri}`)
+            },
+            cancel: function() {
+              console.log('handling cancel')
+            },
+            fail: function(data, code) {
+              console.log(`handling fail, code = ${code}`)
+            }
+          })
+
         },
         fail: function(data, code) {
           console.log(`handling fail, code = ${code}`)
@@ -146,7 +190,7 @@ export default {
         // 获取回调中的照片地址
         _this.pictureUrl = data.uri
         // console.log(data)
-        _this.uploadFile()
+        _this.cutPhoto()
         // 上传
       },
       fail(data, code) {
@@ -195,6 +239,71 @@ export default {
       }
     })
   },
+
+  /*
+    图片裁剪
+  */
+  async cutPhoto(){
+    let self = this
+
+
+    let crops = await new Promise((resolve,reject)=>{
+      image.getImageInfo({
+        uri: self.pictureUrl,
+        success: function(data) {
+          let origin_width = data.width,
+              origin_height  = data.height,
+              crop_x = origin_width / 750 * self.scanFrameMarginLeftRight
+          
+          let crop = {
+            x : Math.floor(crop_x),
+            y : Math.floor(crop_x / self.scanFrameMarginLeftRight * self.scanFrameMarginTop ),
+            width  : Math.floor(crop_x / self.scanFrameMarginLeftRight * self.scanFrameWidth) ,
+            height : Math.floor(crop_x / self.scanFrameMarginLeftRight * self.scanFrameHeight)
+          }
+
+          self.rate = crop.width / 416
+          resolve(crop)
+          },
+        fail: function(data, code) {
+            console.log(`handling fail, code = ${code}`)
+        }
+      })
+    })
+
+    let uri = await new Promise((resolve,reject)=>{
+        image.applyOperations({
+          uri: self.pictureUrl,
+          operations: [
+            {
+              action: 'crop',
+              x: crops.x,
+              y: crops.y,
+              width: crops.width,
+              height: crops.height
+            }
+          ],
+          quality: 99,
+          success: function(data) {
+            resolve(data.uri)
+          },
+          fail: function(data, code) {
+            console.log(`handling fail, code = ${code}`)
+          }
+        })
+    })
+
+    self.pictureUrl = uri
+
+    // self.hideLoading()
+    // self.pop = 'popUp'
+    // self.showResult()
+
+    self.uploadFile()
+  },
+  /*
+    上传图片到服务器
+  */
   uploadFile () {
       this.showLoading('查询中...')
       const self = this
@@ -211,8 +320,30 @@ export default {
           // self.fileUploadData = ret.data
           let res = ret.data
           res = JSON.parse(res)
-          self.objectName = res.item
-          self.percent  = +Math.random().toFixed(2)
+          let items = res.item
+          console.log(items)
+
+          self.resItemsList = []
+          let percentSum = 0
+          // console.log('rate' , self.rate)
+          items.forEach((it)=>{
+            let p = it.position
+            let l = +p.left ,
+                t = +p.top
+            percentSum += +it.score
+            self.resItemsList.push({
+              name : it.name + '-' + it.score,
+              left :l * self.rate,
+              top  :t * self.rate
+            })
+          })
+          
+          if(items.length > 0){
+            self.percent = percentSum/items.length
+          }else{
+            self.percent = 0
+          }
+          console.log(self.resItemsList)
           self.hideLoading()
           self.pop = 'popUp'
           self.showResult()
@@ -326,229 +457,6 @@ export default {
 }
 </script>
 
-<style>
-
-  .demo-page {
-    width: 100%;
-  }
-
-  .bottom-contain{
-    position:fixed;
-    bottom: 0px;
-    height: 200px;
-    width: 100%;
-    background-color: #ffffff;
-    border-top-left-radius: 65px;
-    border-top-right-radius: 65px;
-
-    flex-direction: column;
-    /*justify-content:center;*/
-    align-items: center;
-  }
-  .popUp{
-    animation-name: PopUp;
-    animation-duration: 300ms;
-    height: 500px;
-  }
-  .popDown{
-    animation-name: PopDown;
-    animation-duration: 300ms;
-    height: 200px;
-  }
-  @keyframes PopUp {
-    from {
-      height: 200px;
-    }
-    to {
-      height: 500px;
-    }
-  }
-  @keyframes PopDown {
-    to {
-      height: 200px;
-    }
-    from {
-      height: 500px;
-    }
-  }
-
-  .btn-contain{
-    /*flex-direction: column;*/
-    width: 100%;
-    height: 100%;
-    justify-content: space-between;
-    align-items: center;
-  }
-  /* 按钮 */
-  .btn {
-    width: 250px;
-    height: 86px;
-    /*margin-top: 57px;*/
-    border-radius: 43px;
-    background-color: #13c2c2;
-    font-size: 30px;
-    color: #ffffff;
-  }
-  .btn:active{
-    background-color: #08979c;
-  }
-  /* 相册按钮 */
-  .album-contain{
-    background-color: #13c2c2;
-    width: 60px;
-    height: 60px;
-    border-radius: 25px;
-    margin-left: 40px;
-    align-items: center;
-    justify-content: center;
-  }
-  .album-contain:active{
-    background-color: #08979c;
-  }
-  .album-img{
-    object-fit:center;
-    /*width: 500px;*/
-    height: 36px;
-    width: 36px;
-  }
-
-  .camera {
-    width: 750px;
-    height: 100%;
-    position: fixed;
-    top: 0;
-    left: 0;
-  }
-  
-  /*中间取景框*/
-  .scan-frame{ 
-     position: fixed;
-     top: 200px;
-     left: 125px;
-     height: 500px;
-     width: 500px;
-     background-color: #fff;
-     opacity: 0.1;
-  }
-
-  /*四周遮罩*/
-  .shade{
-    background-color: #f0f5ff;
-    opacity: 0.6;
-  }
-  .mask-top{
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 750px;
-    height: 200px;
-  }
-  .mask-left{
-    position: fixed;
-    top: 200px;
-    width: 125px;
-    height: 500px;
-  }
-  .mask-right{
-    position: fixed;
-    left: 625px;
-    top: 200px;
-    width: 125px;
-    height: 500px;
-  }
-  .mask-bottom{
-    position: fixed;
-    top: 700px;
-    width: 750px;
-    height: 800px;
-  }
-
-  /*拍摄图像*/
-  .result-image{
-    width: 750px;
-    height: 90%;
-  }
-  .result-text{
-    font-size:20px;
-    font-weight:bold;
-  }
-
-
-  /* 返回按钮 */
-  .return-contain{
-    position: absolute;
-    background-color: #e8e8e8;
-    width: 50px;
-    height: 50px;
-    border-radius: 25px;
-    /*margin-left: 40px;*/
-    align-items: center;
-    justify-content: center;
-    top: 20;
-    left: 40;
-  }
-  .return-contain:active{
-    background-color: #bfbfbf;
-  }
-  .return-img{
-    object-fit:center;
-    height: 30px;
-    width: 30px;
-  }
-
-  .warp-line{
-    margin-top: 10px;
-    height: 10px;
-    width: 350px;
-    background-color: #8c8c8c;
-    border-radius: 5px;
-  }
-
-  .object-name{
-    margin-top: 50px;
-    font-size: 30px;
-    font-weight: 900;
-  }
-  .percent-contain{
-    margin-top: 60px;
-    align-items: center;
-    justify-content: center;
-    display: flex;
-    flex-direction: column;
-  }
-  canvas{
-    width: 200px;
-    height: 100px;
-    /*background-color: #f0f5ff*/
-  } 
-  .percent-num{
-    margin-top: -35px;
-  }
-  .percent-name{
-    font-weight: 800;
-    font-size: 35px;
-  }
-
-
-  /* 反馈 */
-  .report-contain{
-    background-color: #e8e8e8;
-    margin-top: 10px;
-    width: 200px;
-    height: 30px;
-    align-items: center;
-    justify-content: center;
-    border-radius: 10px;
-  }
-  .report-contain:active{
-    background-color: #bfbfbf
-  }
-  .report-contain text{
-    font-size: 15px;
-    color: #595959;
-    font-weight: 500;
-  }
-
-
-
+<style lang="less">
+  @import 'scan.less';
 </style>

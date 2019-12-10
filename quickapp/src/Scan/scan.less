@@ -1,0 +1,250 @@
+@page-background-color : #f0f5ff;
+@shade-color : #f0f5ff;
+@scan-frame-margin-top: 400px;     /*取景框距顶部距离*/
+@scan-frame-margin-left-right: 80px ; /*取景框距两边距离*/
+@scan-frame-width: 590px;
+@scan-frame-height: 590px;
+
+@bottom-height-small: 200px;
+@bottom-height-big: 500px;
+
+@result-image-magin-top: 200px;
+
+.scan-page {
+  width: 100%;
+  background-color: @page-background-color;
+}
+
+/* camera 全屏*/
+.camera {
+  width: 750px;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+/*中间取景框*/
+.scan-frame{ 
+  position: fixed;
+  top: @scan-frame-margin-top;                    
+  left: @scan-frame-margin-left-right;
+  height: @scan-frame-height;
+  width: @scan-frame-width;
+  background-color: #fff;
+  opacity: 0;
+}
+
+/*四周遮罩*/
+.shade{
+  background-color: @shade-color;
+  opacity: 0.5;
+}
+.mask-top{
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 750px;
+  height: @scan-frame-margin-top;
+}
+.mask-left{
+  position: fixed;
+  top: @scan-frame-margin-top;
+  width: @scan-frame-margin-left-right;
+  height: @scan-frame-height;
+}
+.mask-right{
+  position: fixed;
+  left: @scan-frame-width + @scan-frame-margin-left-right ;
+  top: @scan-frame-margin-top;
+  width: @scan-frame-margin-left-right;
+  height: @scan-frame-height;
+}
+.mask-bottom{
+  position: fixed;
+  top: @scan-frame-height + @scan-frame-margin-top;
+  width: 750px;
+  height: 800px;
+}
+
+/* 底部框整体  */
+.bottom-contain{
+  position:fixed;
+  bottom: 0px;
+  height: @bottom-height-small;
+  width: 100%;
+  background-color: #ffffff;
+  border-top-left-radius: 65px;
+  border-top-right-radius: 65px;
+  flex-direction: column;
+  align-items: center;
+}
+.popUp{
+  animation-name: PopUp;
+  animation-duration: 300ms;
+  height: @bottom-height-big;
+}
+@keyframes PopUp {
+  from {
+    height: @bottom-height-small;
+  }
+  to {
+    height: @bottom-height-big;
+  }
+}
+.popDown{
+  animation-name: PopDown;
+  animation-duration: 300ms;
+  height: @bottom-height-small;
+}
+@keyframes PopDown {
+  to {
+    height: @bottom-height-small;
+  }
+  from {
+    height: @bottom-height-big;
+  }
+}
+
+/* 按钮 */
+.btn-contain{
+  width: 100%;
+  height: 100%;
+  justify-content: space-between;
+  align-items: center;
+}
+/* 拍照男牛 */
+.btn-camera{
+  width: 250px;
+  height: 86px;
+  /*margin-top: 57px;*/
+  border-radius: 43px;
+  background-color: #13c2c2;
+  font-size: 30px;
+  color: #ffffff;
+}
+.btn:active{
+  background-color: #08979c;
+}
+/* 相册按钮 */
+.album-contain{
+  background-color: #13c2c2;
+  width: 60px;
+  height: 60px;
+  border-radius: 25px;
+  margin-left: 40px;
+  align-items: center;
+  justify-content: center;
+}
+.album-contain:active{
+  background-color: #08979c;
+}
+.album-img{
+  object-fit:center;
+  /*width: 500px;*/
+  height: 36px;
+  width: 36px;
+}
+
+/* 结果展示图片 */
+.result-image-contain{
+   position: fixed;
+   top: @result-image-magin-top;
+   left: @scan-frame-margin-left-right;
+   height: @scan-frame-width;
+   width: @scan-frame-height;
+   border-radius: 20px;
+   border-width: 1px;
+   border-color: #f0f5ff;
+    
+   img {
+      border-radius: 20px;
+      border-width: 1px;
+      border-color: #f0f5ff;
+   }
+}
+
+.result-text{
+  font-size:20px;
+  font-weight:bold;
+}
+.result-text-upon-image{
+  position: absolute;
+  font-size:20px;
+  font-weight:bold;
+  z-index: 999;
+  background-color: #f0f5ff;
+}
+
+
+/* 返回按钮 */
+.return-contain{
+  position: absolute;
+  background-color: #e8e8e8;
+  width: 50px;
+  height: 50px;
+  border-radius: 25px;
+  align-items: center;
+  justify-content: center;
+  top: 20;
+  left: 40;
+}
+.return-contain:active{
+  background-color: #bfbfbf;
+}
+.return-img{
+  object-fit:center;
+  height: 30px;
+  width: 30px;
+}
+
+.warp-line{
+  margin-top: 10px;
+  height: 10px;
+  width: 350px;
+  background-color: #8c8c8c;
+  border-radius: 5px;
+}
+
+.object-name{
+  margin-top: 50px;
+  font-size: 30px;
+  font-weight: 900;
+}
+.percent-contain{
+  margin-top: 100px;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+}
+canvas{
+  width: 200px;
+  height: 100px;
+} 
+.percent-num{
+  margin-top: -35px;
+}
+.percent-name{
+  font-weight: 800;
+  font-size: 35px;
+}
+
+
+/* 反馈 */
+.report-contain{
+  background-color: #e8e8e8;
+  margin-top: 10px;
+  width: 200px;
+  height: 30px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+}
+.report-contain:active{
+  background-color: #bfbfbf
+}
+.report-contain text{
+  font-size: 15px;
+  color: #595959;
+  font-weight: 500;
+}
