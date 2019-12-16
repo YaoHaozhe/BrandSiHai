@@ -9,5 +9,5 @@ numpy
 
 # yolo3 model requirements
 keras==2.2.4
-tensorflow==1.14
+tensorflow==1.15.0
 matplotlib
